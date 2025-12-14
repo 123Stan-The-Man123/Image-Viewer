@@ -31,7 +31,24 @@ int main(void)
 
     SDL_Renderer *renderer = SDL_CreateRenderer(window, NULL);
 
-    SDL_SetRenderLogicalPresentation(renderer, width, height, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+    SDL_Rect screen_size;
+    SDL_GetDisplayBounds(SDL_GetDisplays(NULL)[0], &screen_size);
+
+    if (width > screen_size.w && height > screen_size.h) {
+        float width_factor = (float) screen_size.w/width;
+        float height_factor = (float) screen_size.h/height;
+
+        SDL_SetWindowSize(window, width*width_factor, height*height_factor);
+        SDL_SetRenderScale(renderer, width_factor, height_factor);
+    } else if (width > screen_size.w) {
+        float scale_factor = (float) screen_size.w/width;
+        SDL_SetWindowSize(window, width*scale_factor, height*scale_factor);
+        SDL_SetRenderScale(renderer, scale_factor, scale_factor);
+    } else if (height > screen_size.h) {
+        float scale_factor = (float) screen_size.h/height;
+        SDL_SetWindowSize(window, width*scale_factor, height*scale_factor);
+        SDL_SetRenderScale(renderer, scale_factor, scale_factor);
+    }
 
     parse_image(signature, width, height, renderer);
 
